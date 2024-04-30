@@ -306,6 +306,7 @@ describe('Gradle build file parser', function() {
                 id 'id.with.underscore_symbol'
                 id ('plugin.id.parens')
                 id ('plugin.id.parens.version') version '1.2.3'
+                id 'plugin.with.plus.wildcard' version '3.2.+'
              }
             */});
 
@@ -318,7 +319,8 @@ describe('Gradle build file parser', function() {
             {id: 'id.with.hyphen-symbol'},
             {id: 'id.with.underscore_symbol'},
             {id: 'plugin.id.parens'},
-            {id: 'plugin.id.parens.version', version: '1.2.3'}
+            {id: 'plugin.id.parens.version', version: '1.2.3'},
+            {id: 'plugin.with.plus.wildcard', version: '3.2.+'}
         ]
       };
       return parser.parseText(dsl).then(function(parsedValue) {
