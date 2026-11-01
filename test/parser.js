@@ -1,10 +1,24 @@
 'use strict';
 var assert = require('node:assert');
+var fs = require('node:fs');
+var os = require('node:os');
+var path = require('node:path');
 var test = require('node:test');
 var describe = test.describe;
 var it = test.it;
 
 var parser = require('../lib/parser');
+
+function parseTemporaryFile(t, content) {
+  var directory = fs.mkdtempSync(path.join(os.tmpdir(), 'gradle-to-js-'));
+  t.after(function() {
+    fs.rmSync(directory, {recursive: true});
+  });
+
+  var filePath = path.join(directory, 'build.gradle');
+  fs.writeFileSync(filePath, content);
+  return parser.parseFile(filePath);
+}
 
 // Removes the first and last line breaks of a template literal, along with the indentation of its least indented line
 function stripIndent(text) {
@@ -665,6 +679,21 @@ describe('Gradle build file parser', function() {
 
       return parser.parseFile(sampleFilePath).then(function(parsedValue) {
         assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
+    it('should be able to parse files larger than a single stream chunk', function(t) {
+      var content = 'first "value"\nandroid {\n  key "value"\n}\n';
+      for (var i = 0; i < 10000; i++) {
+        content += 'key' + i + ' "value"\n';
+      }
+      content += 'last "value"\n';
+
+      return parseTemporaryFile(t, content).then(function(parsedValue) {
+        assert.strictEqual(Object.keys(parsedValue).length, 10003);
+        assert.strictEqual(parsedValue.first, 'value');
+        assert.deepStrictEqual(parsedValue.android, {key: 'value'});
+        assert.strictEqual(parsedValue.last, 'value');
       });
     });
 
