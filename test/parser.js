@@ -1,8 +1,21 @@
 'use strict';
-var expect = require('chai').expect;
-var multiline = require('multiline');
+var assert = require('node:assert');
+var test = require('node:test');
+var describe = test.describe;
+var it = test.it;
 
 var parser = require('../lib/parser');
+
+// Removes the first and last line breaks of a template literal, along with the indentation of its least indented line
+function stripIndent(text) {
+  var lines = text.replace(/^[ \t]*\r?\n/, '').replace(/\r?\n[ \t]*$/, '').split('\n');
+  var indent = lines.reduce(function(smallest, line) {
+    return line.trim() ? Math.min(smallest, line.match(/^[ \t]*/)[0].length) : smallest;
+  }, Infinity);
+  return lines.map(function(line) {
+    return line.slice(indent);
+  }).join('\n');
+}
 
 describe('Gradle build file parser', function() {
   describe('(text parsing)', function() {
@@ -11,7 +24,7 @@ describe('Gradle build file parser', function() {
       var expected = {key: 'value'};
 
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
@@ -19,69 +32,65 @@ describe('Gradle build file parser', function() {
       var dsl = 'key = "value"';
       var expected = {key: 'value'};
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('can parse a multiple <<key value>> combinations', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              key "value"
              key2 "value2"
-             */
-      });
+             `);
       var expected = {key: 'value', key2: 'value2'};
 
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('can parse a multiple <<key=value>> combinations', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              key = "value"
              key2 = "value2"
-             */
-      });
+             `);
       var expected = {key: 'value', key2: 'value2'};
 
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('can detect a block', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              testblock {
 
              }
-             */
-      });
+             `);
       var expected = {testblock: {}};
 
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
 
     });
 
     it('can detect a single level block and its values', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              testblock {
              key1 "value1"
              key2 "value2"
              }
-             */
-      });
+             `);
       var expected = {testblock: {key1: 'value1', key2: 'value2'}};
 
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
 
     });
 
     it('can detect a multiple single level block and their values', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              testblock {
              key1 "value1"
              key2 "value2"
@@ -90,21 +99,20 @@ describe('Gradle build file parser', function() {
              key3 "value3"
              key4 "value4"
              }
-             */
-      });
+             `);
       var expected = {
         testblock: {key1: 'value1', key2: 'value2'},
         testblock2: {key3: 'value3', key4: 'value4'}
       };
 
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
 
     });
 
     it('can detect a mix of single level items', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              testblock {
              key1 "value1"
              key2 "value2"
@@ -114,8 +122,7 @@ describe('Gradle build file parser', function() {
              key3 "value3"
              key4 "value4"
              }
-             */
-      });
+             `);
       var expected = {
         testblock: {key1: 'value1', key2: 'value2'},
         testblock2: {key3: 'value3', key4: 'value4'},
@@ -123,13 +130,13 @@ describe('Gradle build file parser', function() {
       };
 
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
 
     });
 
     it('can detect chaos', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              testblock {
              key1 "value1"
              key2 "value2"
@@ -146,8 +153,7 @@ describe('Gradle build file parser', function() {
              key2 "value2"
              }
              testblock3 "not really"
-             */
-      });
+             `);
       var expected = {
         testblock: {
           key1: 'value1',
@@ -164,7 +170,7 @@ describe('Gradle build file parser', function() {
         testblock3: 'not really'
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
 
     });
@@ -184,18 +190,18 @@ describe('Gradle build file parser', function() {
 
       var expected = {key: 'value', key2: 'value2', key3: 'value3'};
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
     it('will store multiple occurences of a key as an array', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
                 testblock {
                     key1 "value1"
                     key1 "value2"
                 }
                 key1 "value3"
                 key1 "value4"
-            */      });
+            `);
 
       var expected = {
         testblock: {
@@ -204,18 +210,18 @@ describe('Gradle build file parser', function() {
         key1: ['value3', 'value4']
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('will be able to parse a list of items', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
                 testblock {
                     key1 ["value1", "value2"]
                 }
                 key1 ["value3", "value4"]
                 specialKey " " + key1["sausage"]
-            */      });
+            `);
 
       var expected = {
         testblock: {
@@ -225,64 +231,64 @@ describe('Gradle build file parser', function() {
         specialKey: '" " + key1["sausage"]'
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     // Because the scoping that def imposes doesn't make a difference for us
     it('should be able to collect definitions as regular variables', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              def myVar1 = new Var()
              def myVar2 = new Var(2)
-             */      });
+             `);
 
       var expected = {
         myVar1: 'new Var()',
         myVar2: 'new Var(2)'
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('should be able to collect complex definitions as regular variables', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              def MyType myVar1 = new Var()
              def MyType myVar2 = new Var(2)
-             */      });
+             `);
 
       var expected = {
         myVar1: 'new Var()',
         myVar2: 'new Var(2)'
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('should skip (seemingly) function calls to variables', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              def MyType myVar1 = new Var()
              myVar1.loadSomething(new Cake())
-             */      });
+             `);
 
       var expected = {
         myVar1: 'new Var()'
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('should group repositories into an array', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              repositories {
                 mavenCentral()
                 maven {
                     url "http://test"
                 }
              }
-            */});
+            `);
 
       var expected = {
         repositories: [
@@ -291,12 +297,12 @@ describe('Gradle build file parser', function() {
         ]
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('should group plugins into an array with a given format', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              plugins {
                 id 'some.id.here' version 'some.version.here'
                 id 'another.id.here'
@@ -308,7 +314,7 @@ describe('Gradle build file parser', function() {
                 id ('plugin.id.parens.version') version '1.2.3'
                 id 'plugin.with.plus.wildcard' version '3.2.+'
              }
-            */});
+            `);
 
       var expected = {
         plugins: [
@@ -324,18 +330,17 @@ describe('Gradle build file parser', function() {
         ]
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('should be able to parse booleans into booleans', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              myVar1 true
              someAttribute true
              someFalseAttribute false
              myVar2 false
-             */
-      });
+             `);
 
       var expected = {
         myVar1: true,
@@ -344,17 +349,17 @@ describe('Gradle build file parser', function() {
         myVar2: false
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('should parse numbers as strings', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              myVar301 1
              myVar402 32
              myVar103 33
              myVar204 4
-             */      });
+             `);
 
       var expected = {
         myVar301: '1',
@@ -363,47 +368,47 @@ describe('Gradle build file parser', function() {
         myVar204: '4'
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
     it('can skip if blocks', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              myVar1 "a"
              if (myVar301 === "sausage") {
                 myVar2 "b"
              }
              myVar2 "c"
-             */      });
+             `);
 
       var expected = {
         myVar1: 'a',
         myVar2: 'c'
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('can skip if clauses without brackets', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              myVar1 "a"
              if (myBreakfast === "eggs") myVar1 "b"
              myVar2 "c"
              if (myBreakfast === "bacon")
                 myVar2 "d"
-             */      });
+             `);
 
       var expected = {
         myVar1: 'a',
         myVar2: 'c'
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
 });
 
     it('can skip function definitions', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
              myVar1 "a"
              def fibonacci (int i) {
                if (i <= 2) {
@@ -413,19 +418,19 @@ describe('Gradle build file parser', function() {
                }
              }
              myVar2 "c"
-             */      });
+             `);
 
       var expected = {
         myVar1: 'a',
         myVar2: 'c'
       };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('will manage to parse closures that have brackets on another line', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
         android {
           property1 'one'
         }
@@ -434,16 +439,16 @@ describe('Gradle build file parser', function() {
         {
           property2 'two'
         }
-      */});
+      `);
 
       var expected = { android: { property1: 'one', property2: 'two'} };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('will merge multiple closures with the same key into one', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
         android {
           property1 'one'
         }
@@ -455,15 +460,15 @@ describe('Gradle build file parser', function() {
         android {
           property3 'three'
         }
-      */});
+      `);
 
       var expected = { android: { property1: 'one', property2: 'two', property3: 'three' } };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
     it('will deep merge multiple complex closures with the same key into one', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
         foo {
           android {
             property1 'one'
@@ -481,16 +486,16 @@ describe('Gradle build file parser', function() {
             property4 'four'
           }
         }
-      */});
+      `);
 
       var expected = {foo: { android: { property1: 'one', property2: 'two', property3: 'three', property4: 'four' } } };
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
     it('will handle compile keywords separately', function() {
-      var dsl = multiline.stripIndent(function() {/*
+      var dsl = stripIndent(`
       dependencies {
         compile (project(':react-native-maps')) {
           exclude group: 'com.google.android.gms', module: 'play-services-base'
@@ -502,7 +507,7 @@ describe('Gradle build file parser', function() {
         compile 'g1:a1:v1'
         compile group: 'g2', name: 'a2', version: 'v2'
       }
-      */});
+      `);
 
       var expected = {
         dependencies: [
@@ -552,7 +557,7 @@ describe('Gradle build file parser', function() {
       };
 
       return parser.parseText(dsl).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
@@ -561,7 +566,7 @@ describe('Gradle build file parser', function() {
         var expected = require(process.cwd() + '/test/sample-data/windows_crlf.gradle.expected.js').expected;
 
         return parser.parseFile(sampleFilePath).then(function(parsedValue) {
-          expect(parsedValue).to.deep.equal(expected);
+          assert.deepStrictEqual(parsedValue, expected);
         });
     });
     // TODO: Add test for ...
@@ -585,7 +590,7 @@ describe('Gradle build file parser', function() {
         testblock3: 'not really'
       };
       return parser.parseFile(sampleFilePath).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
@@ -594,7 +599,7 @@ describe('Gradle build file parser', function() {
       var expected = require(process.cwd() + '/test/sample-data/muzei.build.gradle.expected.js').expected;
 
       return parser.parseFile(sampleFilePath).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
@@ -603,7 +608,7 @@ describe('Gradle build file parser', function() {
       var expected = require(process.cwd() + '/test/sample-data/ivy.build.gradle.expected.js').expected;
 
       return parser.parseFile(sampleFilePath).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
 
@@ -612,7 +617,7 @@ describe('Gradle build file parser', function() {
       var expected = require(process.cwd() + '/test/sample-data/test.compile.build.gradle.expected.js').expected;
 
       return parser.parseFile(sampleFilePath).then(function(parsedValue) {
-        expect(parsedValue).to.deep.equal(expected);
+        assert.deepStrictEqual(parsedValue, expected);
       });
     });
   });
