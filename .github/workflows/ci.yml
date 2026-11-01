@@ -1,18 +1,23 @@
 name: ci
 on:
   push:
-    branches: ['*']
+    branches: [main]
   pull_request:
+permissions:
+  contents: read
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ['12', '14', '16']
+        node: ['20', '22', '24', '26']
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node }}
-      - run: yarn --frozen-lockfile
-      - run: yarn test
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts
+      - run: npm test
