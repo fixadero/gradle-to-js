@@ -612,6 +612,19 @@ describe('Gradle build file parser', function() {
       });
     });
 
+    // Output snapshots, not a statement of correctness: some of these values are plainly wrong, but consumers see them.
+    // The Expo files come from expo/expo@dfb069d9cc5b, the React Native one from react-native-community/template@4f3db581f9ba.
+    ['expo.app', 'expo.root', 'react-native.app', 'special.dependencies'].forEach(function(name) {
+      it('should keep its output for the ' + name + ' gradle file', function() {
+        var sampleFilePath = 'test/sample-data/' + name + '.build.gradle';
+        var expected = require(process.cwd() + '/' + sampleFilePath + '.expected.js').expected;
+
+        return parser.parseFile(sampleFilePath).then(function(parsedValue) {
+          assert.deepStrictEqual(parsedValue, expected);
+        });
+      });
+    });
+
     it('should be able to parse the testCompile with multiline gradle file', function() {
       var sampleFilePath = 'test/sample-data/test.compile.build.gradle';
       var expected = require(process.cwd() + '/test/sample-data/test.compile.build.gradle.expected.js').expected;
