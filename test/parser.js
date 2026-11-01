@@ -569,6 +569,62 @@ describe('Gradle build file parser', function() {
           assert.deepStrictEqual(parsedValue, expected);
         });
     });
+
+    it('can handle an unbalanced project reference', function() {
+      var dsl = stripIndent(`
+        dependencies {
+          implementation project(':some-module'
+        }
+        key "value"
+      `);
+
+      var expected = {
+        dependencies: [
+          {group: '', name: 'project(\':some-module\'', version: '', type: 'implementation', excludes: []}
+        ],
+        key: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
+    it('can handle a key named hasOwnProperty', function() {
+      var dsl = stripIndent(`
+        hasOwnProperty "value"
+        key "value2"
+      `);
+
+      var expected = {hasOwnProperty: 'value', key: 'value2'};
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
+    it('will reject when it fails to parse the input', function() {
+      var tooDeeplyNested = 'key {\n'.repeat(100000);
+
+      return assert.rejects(parser.parseText(tooDeeplyNested), RangeError);
+    });
+
+    it('will not pollute the Object prototype', function() {
+      var dsl = stripIndent(`
+        key {
+          __proto__ {
+            polluted "yes"
+          }
+        }
+        key {
+          __proto__ {
+            polluted "yes"
+          }
+        }
+      `);
+
+      return parser.parseText(dsl).then(function() {
+        assert.strictEqual({}.polluted, undefined);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {
