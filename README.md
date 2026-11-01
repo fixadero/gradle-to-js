@@ -7,6 +7,8 @@
 
 gradle-to-js is a quick & dirty Gradle build file to JavaScript object parser. It is quick & dirty in the sense that it doesn't give you an exact replica of whatever the build file represents during runtime, as evaluations and similar bits are (currently) too much of a hassle to accurately represent while parsing.
 
+Only the Groovy DSL is supported. Kotlin DSL files (`build.gradle.kts`) are a different language, and may look like they parse while dependencies go missing.
+
 ## Installation
 
 Simply run the following command to include it into your project:
@@ -46,7 +48,7 @@ The promise will eventually resolve an object matching the build file structure 
 You can also use the module directly from the CLI, and get a json representation out of it. Nifty ey? Currently only supporting files from this direction.
 
 ```bash
-./index.js test/sample-data/small.build.gradle
+./cli.js test/sample-data/small.build.gradle
 ```
 
 ```json
@@ -78,5 +80,5 @@ You can also use the module directly from the CLI, and get a json representation
 
 Apache 2.0
 
-[1]: https://github.com/ninetwozero/gradle-to-js/workflows/ci/badge.svg
+[1]: https://github.com/ninetwozero/gradle-to-js/actions/workflows/ci.yml/badge.svg
 [2]: https://github.com/ninetwozero/gradle-to-js/actions
