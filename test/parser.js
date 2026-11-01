@@ -584,6 +584,27 @@ describe('Gradle build file parser', function() {
         });
     });
 
+    it('will keep non-ASCII characters intact', function() {
+      var dsl = stripIndent(`
+        name "Mållgan åäö 日本語 🫡"
+        block {
+          nyckel "värde"
+        }
+        dependencies {
+          implementation 'a:b:1'
+        }
+      `);
+
+      var expected = {
+        name: 'Mållgan åäö 日本語 🫡',
+        block: {nyckel: 'värde'},
+        dependencies: [{group: 'a', name: 'b', version: '1', type: 'implementation', excludes: []}]
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
     it('can handle an unbalanced project reference', function() {
       var dsl = stripIndent(`
         dependencies {
@@ -693,6 +714,16 @@ describe('Gradle build file parser', function() {
         assert.strictEqual(Object.keys(parsedValue).length, 10003);
         assert.strictEqual(parsedValue.first, 'value');
         assert.deepStrictEqual(parsedValue.android, {key: 'value'});
+        assert.strictEqual(parsedValue.last, 'value');
+      });
+    });
+
+    it('will keep non-ASCII characters intact across stream chunks', function(t) {
+      // Places the first byte of the two-byte å at the very end of the first 64 KiB chunk
+      var content = 'key "' + 'a'.repeat(65536 - 'key "'.length - 1) + 'å"\nlast "value"\n';
+
+      return parseTemporaryFile(t, content).then(function(parsedValue) {
+        assert.strictEqual(parsedValue.key.slice(-2), 'aå');
         assert.strictEqual(parsedValue.last, 'value');
       });
     });
