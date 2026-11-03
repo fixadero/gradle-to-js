@@ -689,6 +689,56 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('will leave out comments that come after a value', function() {
+      var dsl = stripIndent(`
+        android {
+          defaultConfig {
+            versionCode 12 // bump me
+            versionName "1.2" /* x */
+            applicationId "com.example" /* a */ // b
+          }
+        }
+        repositories {
+          maven {
+            url "https://example.com/repo" // mirror
+          }
+          google() // the main one
+        }
+        dependencies {
+          implementation deps.foo // pinned
+          implementation 'a:b:1' // see https://example.com
+          implementation("c:d:2") {
+            // exclude group: 'not', module: 'excluded'
+            exclude group: 'x', module: 'y'
+          }
+        }
+        plugins {
+          id 'com.android.application' // version is set elsewhere
+        }
+        url "https://example.com/a//b" // the string keeps its slashes
+      `);
+
+      var expected = {
+        android: {
+          defaultConfig: {versionCode: '12', versionName: '1.2', applicationId: 'com.example'}
+        },
+        repositories: [
+          {type: 'maven', data: {url: 'https://example.com/repo'}},
+          {type: 'unknown', data: {name: 'google()'}}
+        ],
+        dependencies: [
+          {group: '', name: 'deps.foo', version: '', type: 'implementation', excludes: []},
+          {group: 'a', name: 'b', version: '1', type: 'implementation', excludes: []},
+          {group: 'c', name: 'd', version: '2', type: 'implementation', excludes: [{group: 'x', module: 'y'}]}
+        ],
+        plugins: [{id: 'com.android.application'}],
+        url: 'https://example.com/a//b'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {
