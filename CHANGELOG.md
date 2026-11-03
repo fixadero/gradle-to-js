@@ -17,3 +17,4 @@
 - Empty strings come back as `''` instead of keeping their quotes (`'""'`)
 - Plugins from a version catalog, like `alias(libs.plugins.android.application)`, come back as `{alias: 'libs.plugins.android.application'}` instead of `{id: '.application'}`
 - A dependency with nested braces, like `api('a:b') { version { strictly '1' } }` or Expo's `if (…) { … } else { … }`, no longer ends the `dependencies` block early and pushes the rest of it to the top level
+- Braces inside strings are part of the value: `versionName "${major}.${minor}"` now gives `'${major}.${minor}'` instead of `{}` and a stray `""` key

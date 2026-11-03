@@ -901,6 +901,36 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('will keep braces inside strings as part of the value', function() {
+      var dsl = stripIndent(`
+        android {
+          defaultConfig {
+            versionName "\${major}.\${minor}"
+            versionCode 3
+          }
+          namespace "com.example"
+        }
+        repositories {
+          maven { url "https://example.com/\${repo}" }
+        }
+        closing "}"
+        after "value"
+      `);
+
+      var expected = {
+        android: {
+          defaultConfig: {versionName: '${major}.${minor}', versionCode: '3'},
+          namespace: 'com.example'
+        },
+        repositories: [{type: 'maven', data: {url: 'https://example.com/${repo}'}}],
+        closing: '}',
+        after: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {

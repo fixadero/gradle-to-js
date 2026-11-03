@@ -8,22 +8,10 @@ exports.expected = {
   "react": {
     "entryFile": "file([\"node\", \"-e\", \"require('expo/scripts/resolveAppEntry')\", projectRoot, \"android\", \"absolute\"].execute(null, rootDir).text.trim())",
     "reactNativeDir": "new File([\"node\", \"--print\", \"require.resolve('react-native/package.json')\"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()",
-    "hermesCommand": {
-      "paths:": [
-        "require.resolve('react-native/package.json')"
-      ]
-    },
-    "codegenDir": {
-      "paths:": [
-        "require.resolve('react-native/package.json')"
-      ]
-    },
+    "hermesCommand": "new File([\"node\", \"--print\", \"require.resolve('hermes-compiler/package.json', { paths: [require.resolve('react-native/package.json')] })\"].execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath() + \"/hermesc/%OS-BIN%/hermesc\"",
+    "codegenDir": "new File([\"node\", \"--print\", \"require.resolve('@react-native/codegen/package.json', { paths: [require.resolve('react-native/package.json')] })\"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()",
     "enableBundleCompression": "(findProperty('android.enableBundleCompression') ?: false).toBoolean()",
-    "cliFile": {
-      "paths:": [
-        "require.resolve('expo/package.json')"
-      ]
-    },
+    "cliFile": "new File([\"node\", \"--print\", \"require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })\"].execute(null, rootDir).text.trim())",
     "bundleCommand": "export:embed"
   },
   "enableMinifyInReleaseBuilds": "(findProperty('android.enableMinifyInReleaseBuilds') ?: false).toBoolean()",
@@ -39,9 +27,7 @@ exports.expected = {
       "targetSdkVersion": "rootProject.ext.targetSdkVersion",
       "versionCode": "1",
       "versionName": "1.0",
-      "buildConfigField": {
-        "?:": "stable"
-      }
+      "buildConfigField": "\"String\", \"REACT_NATIVE_RELEASE_LEVEL\", \"\\\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\\\"\""
     },
     "signingConfigs": {
       "debug": {
