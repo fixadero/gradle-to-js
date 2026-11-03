@@ -801,6 +801,46 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('will add up repeated dependencies, repositories and plugins blocks', function() {
+      var dsl = stripIndent(`
+        plugins {
+          id 'com.android.application'
+        }
+        repositories {
+          google()
+        }
+        dependencies {
+          implementation 'a:b:1'
+        }
+        key "value"
+        plugins {
+          id 'kotlin-android'
+        }
+        repositories {
+          mavenCentral()
+        }
+        dependencies {
+          implementation 'c:d:2'
+        }
+      `);
+
+      var expected = {
+        plugins: [{id: 'com.android.application'}, {id: 'kotlin-android'}],
+        repositories: [
+          {type: 'unknown', data: {name: 'google()'}},
+          {type: 'unknown', data: {name: 'mavenCentral()'}}
+        ],
+        dependencies: [
+          {group: 'a', name: 'b', version: '1', type: 'implementation', excludes: []},
+          {group: 'c', name: 'd', version: '2', type: 'implementation', excludes: []}
+        ],
+        key: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {
