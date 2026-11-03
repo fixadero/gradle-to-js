@@ -16,15 +16,15 @@ exports.expected = {
     ],
     "dependencies": [
       {
-        "group": "",
-        "name": "'com.android.tools.build:gradle'",
+        "group": "com.android.tools.build",
+        "name": "gradle",
         "version": "",
         "type": "classpath",
         "excludes": []
       },
       {
-        "group": "",
-        "name": "'com.facebook.react:react-native-gradle-plugin'",
+        "group": "com.facebook.react",
+        "name": "react-native-gradle-plugin",
         "version": "",
         "type": "classpath",
         "excludes": []

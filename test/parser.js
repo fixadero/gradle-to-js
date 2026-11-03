@@ -1016,6 +1016,35 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('can parse dependencies without a version', function() {
+      var dsl = stripIndent(`
+        dependencies {
+          classpath('com.android.tools.build:gradle')
+          implementation "com.facebook.react:react-android"
+          implementation platform('androidx.compose:compose-bom:2024.09.00')
+          implementation 'androidx.compose.ui:ui'
+          implementation('com.google.firebase:firebase-analytics') {
+            exclude group: 'x', module: 'y'
+          }
+          implementation project('sub:lib')
+        }
+      `);
+
+      var expected = {
+        dependencies: [
+          {group: 'com.android.tools.build', name: 'gradle', version: '', type: 'classpath', excludes: []},
+          {group: 'com.facebook.react', name: 'react-android', version: '', type: 'implementation', excludes: []},
+          {group: 'androidx.compose', name: 'compose-bom', version: '2024.09.00', type: 'implementation', excludes: []},
+          {group: 'androidx.compose.ui', name: 'ui', version: '', type: 'implementation', excludes: []},
+          {group: 'com.google.firebase', name: 'firebase-analytics', version: '', type: 'implementation', excludes: [{group: 'x', module: 'y'}]},
+          {group: '', name: 'project(\'sub:lib\')', version: '', type: 'implementation', excludes: []}
+        ]
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {

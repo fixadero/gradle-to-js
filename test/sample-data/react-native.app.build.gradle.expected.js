@@ -40,8 +40,8 @@ exports.expected = {
   },
   "dependencies": [
     {
-      "group": "",
-      "name": "\"com.facebook.react:react-android\"",
+      "group": "com.facebook.react",
+      "name": "react-android",
       "version": "",
       "type": "implementation",
       "excludes": []

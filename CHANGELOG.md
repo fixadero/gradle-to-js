@@ -21,3 +21,4 @@
 - Several repositories of the same type, like two `maven { url … }` blocks, now all come back in file order, instead of being merged into the last one
 - Strings that carry on over several lines, either `"""triple-quoted"""` or with a `\` at the end of the line, come back whole instead of their later lines turning into junk keys
 - Project dependencies with a deep path, like `project(':features:home:ui')`, are no longer read as group `features`, name `home` and version `ui`
+- Dependencies without a version, like `'com.android.tools.build:gradle'` or `"com.facebook.react:react-android"`, now come back split into group and name with an empty version, instead of the whole quoted string as the name
