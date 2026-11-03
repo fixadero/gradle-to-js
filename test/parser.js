@@ -778,6 +778,29 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('can parse dependency versions that use variables', function() {
+      var dsl = stripIndent(`
+        dependencies {
+          classpath "com.android.tools.build:gradle:\${versions.android_gradle_plugin}"
+          classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+          implementation("com.facebook.fresco:animated-gif:\${expoLibs.versions.fresco.get()}")
+          implementation "com.example:lib:\${findProperty('libVersion') ?: '1.0'}"
+        }
+      `);
+
+      var expected = {
+        dependencies: [
+          {group: 'com.android.tools.build', name: 'gradle', version: '${versions.android_gradle_plugin}', type: 'classpath', excludes: []},
+          {group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: '$kotlin_version', type: 'classpath', excludes: []},
+          {group: 'com.facebook.fresco', name: 'animated-gif', version: '${expoLibs.versions.fresco.get()}', type: 'implementation', excludes: []},
+          {group: 'com.example', name: 'lib', version: '${findProperty(\'libVersion\') ?: \'1.0\'}', type: 'implementation', excludes: []}
+        ]
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {

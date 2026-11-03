@@ -37,9 +37,9 @@ exports.expected = {
         "excludes": []
       },
       {
-        "group": "",
-        "name": "kotlinVersion ? \"org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion\" : 'org.jetbrains.kotlin:kotlin-gradle-plugin'",
-        "version": "",
+        "group": "org.jetbrains.kotlin",
+        "name": "kotlin-gradle-plugin",
+        "version": "$kotlinVersion",
         "type": "classpath",
         "excludes": []
       }
