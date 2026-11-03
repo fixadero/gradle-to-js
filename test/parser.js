@@ -739,6 +739,45 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('can parse blocks that open and close on the same line', function() {
+      var dsl = stripIndent(`
+        android {
+          buildFeatures { compose true }
+          kotlinOptions { jvmTarget = "17" }
+          namespace "com.example"
+        }
+        repositories {
+          maven { url 'https://www.jitpack.io' }
+          mavenCentral()
+        }
+        allprojects { repositories { google() } }
+        buildscript { dependencies { classpath 'a:b:1' } }
+        plugins { id 'java' }
+        dependencies { implementation 'c:d:2' }
+        after "value"
+      `);
+
+      var expected = {
+        android: {
+          buildFeatures: {compose: true},
+          kotlinOptions: {jvmTarget: '17'},
+          namespace: 'com.example'
+        },
+        repositories: [
+          {type: 'maven', data: {url: 'https://www.jitpack.io'}},
+          {type: 'unknown', data: {name: 'mavenCentral()'}}
+        ],
+        allprojects: {repositories: [{type: 'unknown', data: {name: 'google()'}}]},
+        buildscript: {dependencies: [{group: 'a', name: 'b', version: '1', type: 'classpath', excludes: []}]},
+        plugins: [{id: 'java'}],
+        dependencies: [{group: 'c', name: 'd', version: '2', type: 'implementation', excludes: []}],
+        after: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {

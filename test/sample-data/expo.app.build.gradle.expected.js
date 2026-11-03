@@ -39,7 +39,9 @@ exports.expected = {
       "targetSdkVersion": "rootProject.ext.targetSdkVersion",
       "versionCode": "1",
       "versionName": "1.0",
-      "buildConfigField": {}
+      "buildConfigField": {
+        "?:": "stable"
+      }
     },
     "signingConfigs": {
       "debug": {
@@ -108,6 +110,13 @@ exports.expected = {
       "name": "isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: \"\") == \"true\";",
       "version": "",
       "type": "def",
+      "excludes": []
+    },
+    {
+      "group": "",
+      "name": "d",
+      "version": "",
+      "type": "if",
       "excludes": []
     },
     {

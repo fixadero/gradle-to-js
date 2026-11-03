@@ -61,7 +61,9 @@ exports.expected = {
       },
       {
         "type": "maven",
-        "data": {}
+        "data": {
+          "url": "https://www.jitpack.io"
+        }
       }
     ]
   },

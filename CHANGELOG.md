@@ -9,3 +9,4 @@
 - Plugin versions can contain a `+`, like `3.2.+` ([#44](https://github.com/ninetwozero/gradle-to-js/pull/44), thanks @mrbusche)
 - A dependency or plugin written without a space before its parenthesis, like `implementation("a:b:1")` or `id('com.android.application')`, no longer swallows the line after it ([#32](https://github.com/ninetwozero/gradle-to-js/issues/32), [#29](https://github.com/ninetwozero/gradle-to-js/issues/29))
 - Comments after a value are no longer part of it: `versionCode 12 // bump me` now gives `'12'`
+- Blocks that open and close on the same line keep their contents: `buildFeatures { compose true }` and `maven { url '…' }` no longer come back empty, and `plugins { id 'java' }` no longer swallows the rest of the file
