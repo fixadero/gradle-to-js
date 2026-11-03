@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.2
+## 3.0.0
 
 - Parser failures now reject the promise instead of crashing the host process ([#45](https://github.com/fixadero/gradle-to-js/issues/45))
 - An unbalanced `project(...)` and a key named `hasOwnProperty` now parse like any other line
