@@ -997,6 +997,25 @@ describe('Gradle build file parser', function() {
         assert.strictEqual(parsedValues[1].after, 'value');
       });
     });
+
+    it('can parse project dependencies with a deep path', function() {
+      var dsl = stripIndent(`
+        dependencies {
+          implementation project(':features:home:ui')
+          implementation(project(":core:data:local"))
+        }
+      `);
+
+      var expected = {
+        dependencies: [
+          {group: '', name: 'project(\':features:home:ui\')', version: '', type: 'implementation', excludes: []},
+          {group: '', name: 'project(":core:data:local")', version: '', type: 'implementation', excludes: []}
+        ]
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {
