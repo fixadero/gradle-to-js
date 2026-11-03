@@ -15,3 +15,4 @@
 - `parseFile` now rejects with the original file system error, an `Error` with a `code` like `ENOENT`, instead of the string `"Error parsing stream: …"`. If you matched on that text, check `error.code` instead
 - The CLI exits with code 1 and a one-line message on errors, instead of exiting 0 or printing a stack trace, and takes exactly one path
 - Empty strings come back as `''` instead of keeping their quotes (`'""'`)
+- Plugins from a version catalog, like `alias(libs.plugins.android.application)`, come back as `{alias: 'libs.plugins.android.application'}` instead of `{id: '.application'}`

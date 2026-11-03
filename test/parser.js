@@ -857,6 +857,29 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('can parse plugins from a version catalog', function() {
+      var dsl = stripIndent(`
+        plugins {
+          alias(libs.plugins.android.application)
+          alias(libs.plugins.kotlin.android) apply false
+          alias libs.plugins.compose.compiler
+          id 'org.jetbrains.kotlin.android' version '2.0.0'
+        }
+      `);
+
+      var expected = {
+        plugins: [
+          {alias: 'libs.plugins.android.application'},
+          {alias: 'libs.plugins.kotlin.android'},
+          {alias: 'libs.plugins.compose.compiler'},
+          {id: 'org.jetbrains.kotlin.android', version: '2.0.0'}
+        ]
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {
