@@ -32,6 +32,8 @@ g2js.parseFile('path/to/buildfile').then(function(representation) {
 });
 ```
 
+`parseFile` reads whatever path you give it, just like `fs.readFile`. It doesn't look at the file name or extension. If the path comes from user input, check it yourself before calling `parseFile`, for example by making sure it points inside the directory you expect.
+
 #### Strings
 
 ```js
