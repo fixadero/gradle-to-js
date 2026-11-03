@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Please report vulnerabilities privately: open the [Security tab](https://github.com/ninetwozero/gradle-to-js/security) and click **Report a vulnerability**. Please don't open a public issue for it.
+Please report vulnerabilities privately: open the [Security tab](https://github.com/fixadero/gradle-to-js/security) and click **Report a vulnerability**. Please don't open a public issue for it.
 
 Only the latest release gets security fixes.
 

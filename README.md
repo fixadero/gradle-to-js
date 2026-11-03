@@ -82,5 +82,5 @@ You can also use the module directly from the CLI, and get a json representation
 
 Apache 2.0
 
-[1]: https://github.com/ninetwozero/gradle-to-js/actions/workflows/ci.yml/badge.svg
-[2]: https://github.com/ninetwozero/gradle-to-js/actions
+[1]: https://github.com/fixadero/gradle-to-js/actions/workflows/ci.yml/badge.svg
+[2]: https://github.com/fixadero/gradle-to-js/actions
