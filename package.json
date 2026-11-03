@@ -27,8 +27,5 @@
   "bugs": {
     "url": "https://github.com/ninetwozero/gradle-to-js/issues"
   },
-  "homepage": "https://github.com/ninetwozero/gradle-to-js#readme",
-  "dependencies": {
-    "lodash.merge": "^4.6.2"
-  }
+  "homepage": "https://github.com/ninetwozero/gradle-to-js#readme"
 }

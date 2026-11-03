@@ -1045,6 +1045,55 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('will add up the dependencies of repeated blocks around them', function() {
+      var dsl = stripIndent(`
+        buildscript {
+          repositories {
+            google()
+          }
+          dependencies {
+            classpath 'a:b:1'
+          }
+        }
+        android {
+          defaultConfig {
+            versionCode 1
+          }
+        }
+        buildscript {
+          repositories {
+            mavenCentral()
+          }
+          dependencies {
+            classpath 'c:d:2'
+          }
+        }
+        android {
+          defaultConfig {
+            versionCode 2
+            versionName "2.0"
+          }
+        }
+      `);
+
+      var expected = {
+        buildscript: {
+          repositories: [
+            {type: 'unknown', data: {name: 'google()'}},
+            {type: 'unknown', data: {name: 'mavenCentral()'}}
+          ],
+          dependencies: [
+            {group: 'a', name: 'b', version: '1', type: 'classpath', excludes: []},
+            {group: 'c', name: 'd', version: '2', type: 'classpath', excludes: []}
+          ]
+        },
+        android: {defaultConfig: {versionCode: '2', versionName: '2.0'}}
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {

@@ -22,3 +22,5 @@
 - Strings that carry on over several lines, either `"""triple-quoted"""` or with a `\` at the end of the line, come back whole instead of their later lines turning into junk keys
 - Project dependencies with a deep path, like `project(':features:home:ui')`, are no longer read as group `features`, name `home` and version `ui`
 - Dependencies without a version, like `'com.android.tools.build:gradle'` or `"com.facebook.react:react-android"`, now come back split into group and name with an empty version, instead of the whole quoted string as the name
+- When a block appears twice, like `buildscript { … }`, the `dependencies`, `repositories` and `plugins` inside both copies now add up, instead of the second list overwriting the first entry by entry. Other lists in the second copy replace the first copy's list instead of being mixed into it
+- gradle-to-js no longer depends on `lodash.merge`, or on any other package
