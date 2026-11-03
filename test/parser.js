@@ -884,6 +884,16 @@ describe('Gradle build file parser', function() {
       });
     });
 
+    it('will reject with the file system error when it cannot read the file', function() {
+      var missingFilePath = path.join(os.tmpdir(), 'gradle-to-js-does-not-exist', 'build.gradle');
+
+      return assert.rejects(parser.parseFile(missingFilePath), function(error) {
+        assert.ok(error instanceof Error);
+        assert.strictEqual(error.code, 'ENOENT');
+        return true;
+      });
+    });
+
     it('should be able to parse files larger than a single stream chunk', function(t) {
       var content = 'first "value"\nandroid {\n  key "value"\n}\n';
       for (var i = 0; i < 10000; i++) {

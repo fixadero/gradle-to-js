@@ -12,3 +12,4 @@
 - Blocks that open and close on the same line keep their contents: `buildFeatures { compose true }` and `maven { url '…' }` no longer come back empty, and `plugins { id 'java' }` no longer swallows the rest of the file
 - Dependency versions that use variables, like `"…:kotlin-gradle-plugin:$kotlin_version"` or `"…:gradle:${versions.agp}"`, now come back split into group, name and version ([#42](https://github.com/ninetwozero/gradle-to-js/issues/42))
 - A second `dependencies`, `repositories` or `plugins` block in the same place now adds to the first one instead of replacing it
+- `parseFile` now rejects with the original file system error, an `Error` with a `code` like `ENOENT`, instead of the string `"Error parsing stream: …"`. If you matched on that text, check `error.code` instead
