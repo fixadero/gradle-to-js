@@ -125,9 +125,13 @@ exports.expected = {
       "version": "",
       "type": "if",
       "excludes": []
+    },
+    {
+      "group": "",
+      "name": ".toBoolean()",
+      "version": "",
+      "type": "if",
+      "excludes": []
     }
-  ],
-  "": {
-    "implementation": "jscFlavor"
-  }
+  ]
 };

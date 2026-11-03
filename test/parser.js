@@ -779,6 +779,27 @@ describe('Gradle build file parser', function() {
       });
     });
 
+    it('will keep nested blocks inside a dependency together', function() {
+      var dsl = stripIndent(`
+        dependencies {
+          implementation('a:b:1') { version { strictly '1' } }
+          implementation 'c:d:2'
+        }
+        after "value"
+      `);
+
+      var expected = {
+        dependencies: [
+          {group: 'a', name: 'b', version: '1', type: 'implementation', excludes: []},
+          {group: 'c', name: 'd', version: '2', type: 'implementation', excludes: []}
+        ],
+        after: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
     it('can parse dependency versions that use variables', function() {
       var dsl = stripIndent(`
         dependencies {

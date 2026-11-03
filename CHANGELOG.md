@@ -16,3 +16,4 @@
 - The CLI exits with code 1 and a one-line message on errors, instead of exiting 0 or printing a stack trace, and takes exactly one path
 - Empty strings come back as `''` instead of keeping their quotes (`'""'`)
 - Plugins from a version catalog, like `alias(libs.plugins.android.application)`, come back as `{alias: 'libs.plugins.android.application'}` instead of `{id: '.application'}`
+- A dependency with nested braces, like `api('a:b') { version { strictly '1' } }` or Expo's `if (…) { … } else { … }`, no longer ends the `dependencies` block early and pushes the rest of it to the top level
