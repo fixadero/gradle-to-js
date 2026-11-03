@@ -1145,6 +1145,77 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('can parse lists with comments, nested brackets and commas in strings', function() {
+      var dsl = stripIndent(`
+        project.ext.react = [
+            enableHermes: true,  // clean and rebuild if changing
+            // hermesFlagsRelease: ["-w", "-O", "-output-source-map"],
+            /* bundleInDebug: false, */
+            bundleInRelease: true,
+            deleteDebugFilesForVariant: { // https://github.com/facebook/react-native/issues/33177
+                def v -> v.name.toLowerCase().contains('release')
+            },
+        ]
+        nested [["a", "b"], ["c"]]
+        strings ["a, b", 'c]', "d // e"]
+        calls [file('a', 'b'), 'c']
+        empty []
+        after "value"
+      `);
+
+      var expected = {
+        'project.ext.react': {
+          enableHermes: true,
+          bundleInRelease: true,
+          deleteDebugFilesForVariant: '{\n        def v -> v.name.toLowerCase().contains(\'release\')\n    }'
+        },
+        nested: [['a', 'b'], ['c']],
+        strings: ['a, b', 'c]', 'd // e'],
+        calls: ['file(\'a\', \'b\')', 'c'],
+        empty: [],
+        after: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
+    it('can parse maps, nested or not, and keep everything else in a list as text', function() {
+      var dsl = stripIndent(`
+        ext.versions = [kotlin: '2.0.0', 'agp': "8.5.0", "compose bom": '2024.09.00']
+        ext.deps = [
+          kotlin: [
+            stdlib: [common: "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version", jdk: 'x'],
+          ],
+          flags: [true, "false", 'yes'],
+        ]
+        manifestPlaceholders = [appAuthRedirectScheme: 'com.example', __proto__: 'not a prototype']
+        emptyMap = [:]
+        mixed [a: 1, 'b']
+        ternaries [flag ? 'x' : 'y', 'z']
+        coordinates ['a:b:1', "c:d:2"]
+        after "value"
+      `);
+
+      var expected = {
+        'ext.versions': {kotlin: '2.0.0', agp: '8.5.0', 'compose bom': '2024.09.00'},
+        'ext.deps': {
+          kotlin: {stdlib: {common: 'org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version', jdk: 'x'}},
+          flags: [true, false, 'yes']
+        },
+        manifestPlaceholders: JSON.parse('{"appAuthRedirectScheme": "com.example", "__proto__": "not a prototype"}'),
+        emptyMap: {},
+        mixed: ['a: 1', 'b'],
+        ternaries: ['flag ? \'x\' : \'y\'', 'z'],
+        coordinates: ['a:b:1', 'c:d:2'],
+        after: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+        assert.strictEqual(Object.getPrototypeOf(parsedValue.manifestPlaceholders), Object.prototype);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {
