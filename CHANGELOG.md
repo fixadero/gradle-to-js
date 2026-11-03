@@ -19,3 +19,4 @@
 - A dependency with nested braces, like `api('a:b') { version { strictly '1' } }` or Expo's `if (…) { … } else { … }`, no longer ends the `dependencies` block early and pushes the rest of it to the top level
 - Braces inside strings are part of the value: `versionName "${major}.${minor}"` now gives `'${major}.${minor}'` instead of `{}` and a stray `""` key
 - Several repositories of the same type, like two `maven { url … }` blocks, now all come back in file order, instead of being merged into the last one
+- Strings that carry on over several lines, either `"""triple-quoted"""` or with a `\` at the end of the line, come back whole instead of their later lines turning into junk keys

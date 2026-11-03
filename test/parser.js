@@ -963,6 +963,40 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('can parse strings that carry on over several lines', function() {
+      var dsl = stripIndent(`
+        proguard {
+          keepclassmembers 'class * { \\
+              public <init>(...); \\
+          }'
+          dontwarn 'x'
+        }
+        json """{
+          "version": "\${version}"
+        }"""
+        description '''first line
+        second line // not a comment'''
+        after "value"
+      `);
+
+      var expected = {
+        proguard: {
+          keepclassmembers: 'class * { \\\n      public <init>(...); \\\n  }',
+          dontwarn: 'x'
+        },
+        json: '{\n  "version": "${version}"\n}',
+        description: 'first line\nsecond line // not a comment',
+        after: 'value'
+      };
+      return Promise.all([parser.parseText(dsl), parser.parseText(dsl.replace(/\n/g, '\r\n'))]).then(function(parsedValues) {
+        assert.deepStrictEqual(parsedValues[0], expected);
+        // With Windows line breaks the strings keep their \r, but everything around them still parses the same
+        assert.strictEqual(parsedValues[1].proguard.dontwarn, 'x');
+        assert.strictEqual(parsedValues[1].description, 'first line\r\nsecond line // not a comment');
+        assert.strictEqual(parsedValues[1].after, 'value');
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {
