@@ -841,6 +841,22 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('can parse empty strings', function() {
+      var dsl = stripIndent(`
+        key ""
+        key2 ''
+        block {
+          key3 ""
+        }
+        list ["", "a"]
+      `);
+
+      var expected = {key: '', key2: '', block: {key3: ''}, list: ['', 'a']};
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {
