@@ -99,24 +99,38 @@ exports.expected = {
       "excludes": []
     },
     {
-      "group": "",
-      "name": "d",
+      "group": "com.facebook.fresco",
+      "name": "animated-gif",
+      "version": "${expoLibs.versions.fresco.get()}",
+      "type": "implementation",
+      "excludes": []
+    },
+    {
+      "group": "com.facebook.fresco",
+      "name": "webpsupport",
+      "version": "${expoLibs.versions.fresco.get()}",
+      "type": "implementation",
+      "excludes": []
+    },
+    {
+      "group": "com.facebook.fresco",
+      "name": "animated-webp",
+      "version": "${expoLibs.versions.fresco.get()}",
+      "type": "implementation",
+      "excludes": []
+    },
+    {
+      "group": "com.facebook.react",
+      "name": "hermes-android",
       "version": "",
-      "type": "if",
+      "type": "implementation",
       "excludes": []
     },
     {
       "group": "",
-      "name": "d",
+      "name": "jscFlavor",
       "version": "",
-      "type": "if",
-      "excludes": []
-    },
-    {
-      "group": "",
-      "name": ".toBoolean()",
-      "version": "",
-      "type": "if",
+      "type": "implementation",
       "excludes": []
     }
   ]

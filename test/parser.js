@@ -1094,6 +1094,57 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('will read the dependencies in every branch of an if', function() {
+      var dsl = stripIndent(`
+        dependencies {
+          implementation 'a:b:1'
+          if (isGifEnabled) {
+            implementation("com.facebook.fresco:animated-gif:\${frescoVersion}")
+          }
+          if (isWebpEnabled) {
+            implementation 'c:d:2'
+            if (isWebpAnimatedEnabled) {
+              implementation 'e:f:3'
+            }
+          }
+          if (hermesEnabled.toBoolean()) {
+            implementation("com.facebook.react:hermes-android")
+          } else if (findProperty('x') == ')') {
+            implementation 'g:h:4'
+          } else {
+            implementation jscFlavor
+          }
+          if (debug) implementation 'i:j:5'
+          if(a){ implementation 'k:l:6' }else{ implementation 'm:n:7' }
+          implementation 'o:p:8'
+        }
+        after "value"
+      `);
+
+      function dependency(group, name, version) {
+        return {group: group, name: name, version: version, type: 'implementation', excludes: []};
+      }
+      var expected = {
+        dependencies: [
+          dependency('a', 'b', '1'),
+          dependency('com.facebook.fresco', 'animated-gif', '${frescoVersion}'),
+          dependency('c', 'd', '2'),
+          dependency('e', 'f', '3'),
+          dependency('com.facebook.react', 'hermes-android', ''),
+          dependency('g', 'h', '4'),
+          dependency('', 'jscFlavor', ''),
+          dependency('i', 'j', '5'),
+          dependency('k', 'l', '6'),
+          dependency('m', 'n', '7'),
+          dependency('o', 'p', '8')
+        ],
+        after: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {

@@ -47,10 +47,17 @@ exports.expected = {
       "excludes": []
     },
     {
-      "group": "",
-      "name": ".toBoolean()",
+      "group": "com.facebook.react",
+      "name": "hermes-android",
       "version": "",
-      "type": "if",
+      "type": "implementation",
+      "excludes": []
+    },
+    {
+      "group": "",
+      "name": "jscFlavor",
+      "version": "",
+      "type": "implementation",
       "excludes": []
     }
   ]

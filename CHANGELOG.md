@@ -24,3 +24,4 @@
 - Dependencies without a version, like `'com.android.tools.build:gradle'` or `"com.facebook.react:react-android"`, now come back split into group and name with an empty version, instead of the whole quoted string as the name
 - When a block appears twice, like `buildscript { … }`, the `dependencies`, `repositories` and `plugins` inside both copies now add up, instead of the second list overwriting the first entry by entry. Other lists in the second copy replace the first copy's list instead of being mixed into it
 - gradle-to-js no longer depends on `lodash.merge`, or on any other package
+- Dependencies inside `if (…) { … } else { … }` in a `dependencies` block now come back instead of a junk entry with type `'if'`. The parser can't tell which branch Gradle takes, so it returns the dependencies from every branch: Expo's and React Native's files give both `hermes-android` and `jscFlavor`
