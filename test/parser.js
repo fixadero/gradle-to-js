@@ -931,6 +931,38 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('will keep every repository of the same type, in file order', function() {
+      var dsl = stripIndent(`
+        repositories {
+          google()
+          maven {
+            url 'https://a.example'
+          }
+          mavenCentral()
+          maven { url 'https://b.example' }
+          maven {
+            url 'https://c.example'
+            credentials {
+              username 'user'
+            }
+          }
+        }
+      `);
+
+      var expected = {
+        repositories: [
+          {type: 'unknown', data: {name: 'google()'}},
+          {type: 'maven', data: {url: 'https://a.example'}},
+          {type: 'unknown', data: {name: 'mavenCentral()'}},
+          {type: 'maven', data: {url: 'https://b.example'}},
+          {type: 'maven', data: {url: 'https://c.example', credentials: {username: 'user'}}}
+        ]
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {
