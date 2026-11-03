@@ -109,6 +109,13 @@ exports.expected = {
       "excludes": []
     },
     {
+      "group": "g5",
+      "name": "a5",
+      "version": "v5",
+      "type": "testCompile",
+      "excludes": []
+    },
+    {
       "group": "",
       "name": "project(':project-behind-comment')",
       "version": "",

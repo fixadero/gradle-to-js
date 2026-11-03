@@ -660,6 +660,35 @@ describe('Gradle build file parser', function() {
         assert.strictEqual({}.polluted, undefined);
       });
     });
+
+    it('can parse dependencies and plugins without a space before the parenthesis', function() {
+      var dsl = stripIndent(`
+        plugins {
+          id('com.android.application')
+          id('com.github.triplet.play') version '2.3.0' apply false
+        }
+        dependencies {
+          implementation("org.example:name1:1.0.0")
+          implementation("org.example:name2:1.0.0")
+          classpath('org.example:name3:1.0.0')
+        }
+      `);
+
+      var expected = {
+        plugins: [
+          {id: 'com.android.application'},
+          {id: 'com.github.triplet.play', version: '2.3.0'}
+        ],
+        dependencies: [
+          {group: 'org.example', name: 'name1', version: '1.0.0', type: 'implementation', excludes: []},
+          {group: 'org.example', name: 'name2', version: '1.0.0', type: 'implementation', excludes: []},
+          {group: 'org.example', name: 'name3', version: '1.0.0', type: 'classpath', excludes: []}
+        ]
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {
