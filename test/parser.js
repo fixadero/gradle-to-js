@@ -1145,6 +1145,41 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('can parse lists with comments, nested brackets and commas in strings', function() {
+      var dsl = stripIndent(`
+        project.ext.react = [
+            enableHermes: true,  // clean and rebuild if changing
+            // hermesFlagsRelease: ["-w", "-O", "-output-source-map"],
+            /* bundleInDebug: false, */
+            bundleInRelease: true,
+            deleteDebugFilesForVariant: { // https://github.com/facebook/react-native/issues/33177
+                def v -> v.name.toLowerCase().contains('release')
+            },
+        ]
+        nested [["a", "b"], ["c"]]
+        strings ["a, b", 'c]', "d // e"]
+        calls [file('a', 'b'), 'c']
+        empty []
+        after "value"
+      `);
+
+      var expected = {
+        'project.ext.react': [
+          'enableHermes: true',
+          'bundleInRelease: true',
+          'deleteDebugFilesForVariant: {\n        def v -> v.name.toLowerCase().contains(\'release\')\n    }'
+        ],
+        nested: ['["a", "b"]', '["c"]'],
+        strings: ['a, b', 'c]', 'd // e'],
+        calls: ['file(\'a\', \'b\')', 'c'],
+        empty: [],
+        after: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     // TODO: Add test for ...
   });
   describe('(file parsing)', function() {
