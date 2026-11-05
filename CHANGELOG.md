@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Fixes
+
+- A comment line with nothing after the `//` no longer swallows the next line that has something on it: a bare `//` right above `versionCode 7` used to drop the `versionCode`. The same goes for a `//` followed only by spaces or tabs
+- A block comment at the start of a line no longer swallows the character after its `*/`, so `/* … */}` closes its block. An empty one, like `/**/` or `/* */`, no longer swallows everything up to the next `*/` or the end of the file
+
 ## 3.0.0
 
 Most of this release fixes values that 2.x parsed wrong or dropped, so the output changes for many build files. If you snapshot the output or work around the old results, check them against 3.0.0.

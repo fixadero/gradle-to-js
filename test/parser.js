@@ -207,6 +207,86 @@ describe('Gradle build file parser', function() {
         assert.deepStrictEqual(parsedValue, expected);
       });
     });
+
+    it('will keep the line after a comment with nothing in it', function() {
+      // Written out line by line, so that the whitespace after the `//`s stays put
+      var dsl = [
+        'android {',
+        '  defaultConfig {',
+        '    applicationId "com.example"',
+        '    //',
+        '    versionCode 7',
+        '    // ',
+        '    versionName "1.0"',
+        '    //\t',
+        '',
+        '    minSdkVersion 21',
+        '    //',
+        '  }',
+        '}',
+        'repositories {',
+        '  //',
+        '  google()',
+        '}',
+        'dependencies {',
+        '  //',
+        '  implementation "a:b:1"',
+        '}',
+        'after "value"',
+        '//'
+      ].join('\n');
+
+      var expected = {
+        android: {
+          defaultConfig: {applicationId: 'com.example', versionCode: '7', versionName: '1.0', minSdkVersion: '21'}
+        },
+        repositories: [{type: 'unknown', data: {name: 'google()'}}],
+        dependencies: [{group: 'a', name: 'b', version: '1', type: 'implementation', excludes: []}],
+        after: 'value'
+      };
+      return Promise.all([
+        parser.parseText(dsl),
+        parser.parseText(dsl.replace(/\n/g, '\r\n'))
+      ]).then(function(parsedValues) {
+        assert.deepStrictEqual(parsedValues[0], expected);
+        assert.deepStrictEqual(parsedValues[1], expected);
+      });
+    });
+
+    it('will keep what comes right after a block comment', function() {
+      var dsl = stripIndent(`
+        android {
+          /**/
+          namespace "com.example"
+          /* */
+          compileSdk 34
+          /*
+          */
+          defaultConfig {
+            /* the id */applicationId "com.example"
+            versionCode 7
+          /* end */}
+        }
+        dependencies {
+          /*/ still a comment */
+          implementation "a:b:1"
+          /* end */}
+        after "value"
+      `);
+
+      var expected = {
+        android: {
+          namespace: 'com.example',
+          compileSdk: '34',
+          defaultConfig: {applicationId: 'com.example', versionCode: '7'}
+        },
+        dependencies: [{group: 'a', name: 'b', version: '1', type: 'implementation', excludes: []}],
+        after: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
     it('will store multiple occurences of a key as an array', function() {
       var dsl = stripIndent(`
                 testblock {
