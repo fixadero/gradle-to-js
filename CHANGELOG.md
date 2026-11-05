@@ -7,6 +7,11 @@
 - A comment line with nothing after the `//` no longer swallows the next line that has something on it: a bare `//` right above `versionCode 7` used to drop the `versionCode`. The same goes for a `//` followed only by spaces or tabs
 - A block comment at the start of a line no longer swallows the character after its `*/`, so `/* … */}` closes its block. An empty one, like `/**/` or `/* */`, no longer swallows everything up to the next `*/` or the end of the file
 - Values with a call or parentheses that carry on over several lines come back whole, instead of being cut off at the first line break and their later lines turning into junk keys ([#13](https://github.com/fixadero/gradle-to-js/issues/13)). `def coverage = task("coverage",` followed by `dependsOn: 'x') { … }` now gives `coverage` the block, like it does when the call fits on one line
+- Dependencies that carry on over several lines come back whole ([#17](https://github.com/fixadero/gradle-to-js/issues/17)). That's a call that isn't closed on its first line, like `testCompile(` with its dependencies on the lines below, or a line that ends with a comma, like `runtime 'a:b:1',` followed by `'c:d:2'`. Their later lines used to come back as dependencies of their own, with a type like `'org'` or `'com'`
+- A dependency item can declare several dependencies, and each one comes back on its own: `runtime 'a:b:1', 'c:d:2'`, `testCompile(['a:b:1', 'c:d:2'])` and `runtime([group: 'a', …], [group: 'c', …])` all give two. Only the first one used to come back, or a junk one for the list of maps
+- A map notation in parentheses followed by a block, like `compile(group: 'g', name: 'n', version: '1') { exclude … }`, gives `group: 'g'` instead of `'': 'g'`
+- A dependency like `implementation(libs.foo) { exclude … }` gives the name `libs.foo` instead of `.foo`
+- The block of a dependency written as its last argument, like `implementation 'a:b:1', { exclude … }` or `implementation('a:b:1', { exclude … })`, gives its excludes, and doesn't end up in the name
 
 ## 3.0.0
 

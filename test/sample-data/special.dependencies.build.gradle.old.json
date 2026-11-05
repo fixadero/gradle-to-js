@@ -1,0 +1,147 @@
+{
+ "buildscript": {
+  "repositories": [
+   {
+    "type": "unknown",
+    "data": {
+     "name": "mavenCentral()"
+    }
+   }
+  ],
+  "dependencies": [
+   {
+    "group": "",
+    "name": "some.classpath.entry",
+    "version": "",
+    "type": "classpath",
+    "excludes": []
+   }
+  ]
+ },
+ "dependencies": [
+  {
+   "group": "",
+   "name": "project(':react-native-maps')",
+   "version": "",
+   "type": "compile",
+   "excludes": [
+    {
+     "group": "com.google.android.gms",
+     "module": "play-services-base"
+    },
+    {
+     "group": "com.google.android.gms",
+     "module": "play-services-maps"
+    }
+   ]
+  },
+  {
+   "group": "",
+   "name": "project(':react-native-background-geolocation')",
+   "version": "",
+   "type": "testRuntime",
+   "excludes": [
+    {
+     "group": "com.google.android.gms",
+     "module": "play-services-location"
+    }
+   ]
+  },
+  {
+   "": "g0",
+   "name": "a0",
+   "version": "v0",
+   "type": "compile",
+   "excludes": [
+    {
+     "group": "com.google.android.gms1"
+    },
+    {
+     "module": "play-services-location1"
+    }
+   ]
+  },
+  {
+   "": "g0",
+   "name": "a0",
+   "version": "v0",
+   "type": "compile",
+   "excludes": [
+    {
+     "group": "com.google.android.gms1"
+    },
+    {
+     "module": "play-services-location1"
+    }
+   ]
+  },
+  {
+   "group": "g1",
+   "name": "a1",
+   "version": "v1",
+   "type": "compile",
+   "excludes": []
+  },
+  {
+   "group": "g2",
+   "name": "a2",
+   "version": "v2",
+   "type": "runtime",
+   "excludes": []
+  },
+  {
+   "group": "g3",
+   "name": "a3",
+   "version": "v3",
+   "type": "compile",
+   "excludes": [
+    {
+     "group": "com.google.android.gms",
+     "module": "play-services-location"
+    }
+   ]
+  },
+  {
+   "group": "com.org.g4",
+   "name": "org-a4",
+   "version": "org-v4",
+   "type": "compile",
+   "excludes": []
+  },
+  {
+   "group": "g5",
+   "name": "a5",
+   "version": "v5",
+   "type": "testCompile",
+   "excludes": []
+  },
+  {
+   "group": "",
+   "name": "project(':project-behind-comment')",
+   "version": "",
+   "type": "compile",
+   "excludes": []
+  },
+  {
+   "group": "",
+   "name": "project(':project-behind-comment2')",
+   "version": "",
+   "type": "compile",
+   "excludes": []
+  },
+  {
+   "group": "",
+   "name": "project(':wear')",
+   "version": "",
+   "type": "devWearApp",
+   "excludes": []
+  },
+  {
+   "group": "",
+   "name": "project(':wear')",
+   "version": "",
+   "type": "prodWearApp",
+   "excludes": []
+  }
+ ]
+}

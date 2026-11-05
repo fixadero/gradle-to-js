@@ -48,7 +48,7 @@ exports.expected = {
       ]
     },
     {
-      "": "g0",
+      "group": "g0",
       "name": "a0",
       "version": "v0",
       "type": "compile",
@@ -62,7 +62,7 @@ exports.expected = {
       ]
     },
     {
-      "": "g0",
+      "group": "g0",
       "name": "a0",
       "version": "v0",
       "type": "compile",

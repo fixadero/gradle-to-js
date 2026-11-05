@@ -11,7 +11,7 @@ exports.expected = {
       "group": "org.codehaus.groovy",
       "name": "groovy-all",
       "version": "2.4.10",
-      "type": "org",
+      "type": "testCompile",
       "excludes": []
     },
     {
@@ -25,13 +25,13 @@ exports.expected = {
       "group": "com.netflix.nebula",
       "name": "gradle-lint-plugin",
       "version": "latest.release",
-      "type": "com",
+      "type": "testCompile",
       "excludes": []
     },
     {
       "group": "org.hibernate",
       "name": "hibernate-core",
-      "version": "3.6.7.Final)",
+      "version": "3.6.7.Final",
       "type": "testCompile",
       "excludes": []
     }
