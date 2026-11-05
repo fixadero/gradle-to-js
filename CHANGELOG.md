@@ -6,6 +6,7 @@
 
 - A comment line with nothing after the `//` no longer swallows the next line that has something on it: a bare `//` right above `versionCode 7` used to drop the `versionCode`. The same goes for a `//` followed only by spaces or tabs
 - A block comment at the start of a line no longer swallows the character after its `*/`, so `/* … */}` closes its block. An empty one, like `/**/` or `/* */`, no longer swallows everything up to the next `*/` or the end of the file
+- Values with a call or parentheses that carry on over several lines come back whole, instead of being cut off at the first line break and their later lines turning into junk keys ([#13](https://github.com/fixadero/gradle-to-js/issues/13)). `def coverage = task("coverage",` followed by `dependsOn: 'x') { … }` now gives `coverage` the block, like it does when the call fits on one line
 
 ## 3.0.0
 
