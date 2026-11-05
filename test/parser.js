@@ -1125,6 +1125,93 @@ describe('Gradle build file parser', function() {
       });
     });
 
+    it('can parse dependencies that carry on over several lines or declare several at once', function() {
+      // The runtime dependencies come from #17, which took them from Gradle's documentation
+      var dsl = stripIndent(`
+        dependencies {
+          runtime group: 'org.springframework', name: 'spring-core', version: '2.5'
+          runtime 'org.springframework:spring-core:2.5',
+                  'org.springframework:spring-aop:2.5'
+          runtime(
+              [group: 'org.springframework', name: 'spring-core', version: '2.5'],
+              [group: 'org.springframework', name: 'spring-aop', version: '2.5']
+          )
+          runtime('org.hibernate:hibernate:3.0.5') {
+            transitive = true
+          }
+          runtime group: 'org.hibernate', name: 'hibernate', version: '3.0.5', transitive: true
+          runtime(group: 'org.hibernate', name: 'hibernate', version: '3.0.5') {
+            transitive = true
+          }
+          testImplementation libraries.junit, // the runner
+                  libraries.truth
+          testCompile(['junit:junit:4.12', 'org.hamcrest:hamcrest:2.2'])
+          implementation(
+              libs.foo
+          )
+        }
+        after "value"
+      `);
+
+      function dependency(type, group, name, version) {
+        return {group: group, name: name, version: version, type: type, excludes: []};
+      }
+      var expected = {
+        dependencies: [
+          dependency('runtime', 'org.springframework', 'spring-core', '2.5'),
+          dependency('runtime', 'org.springframework', 'spring-core', '2.5'),
+          dependency('runtime', 'org.springframework', 'spring-aop', '2.5'),
+          dependency('runtime', 'org.springframework', 'spring-core', '2.5'),
+          dependency('runtime', 'org.springframework', 'spring-aop', '2.5'),
+          dependency('runtime', 'org.hibernate', 'hibernate', '3.0.5'),
+          {
+            group: 'org.hibernate', name: 'hibernate', version: '3.0.5', transitive: 'true', type: 'runtime',
+            excludes: []
+          },
+          dependency('runtime', 'org.hibernate', 'hibernate', '3.0.5'),
+          dependency('testImplementation', '', 'libraries.junit', ''),
+          dependency('testImplementation', '', 'libraries.truth', ''),
+          dependency('testCompile', 'junit', 'junit', '4.12'),
+          dependency('testCompile', 'org.hamcrest', 'hamcrest', '2.2'),
+          dependency('implementation', '', 'libs.foo', '')
+        ],
+        after: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
+    it('will read the block of a dependency, wherever it is', function() {
+      var dsl = stripIndent(`
+        dependencies {
+          androidTestImplementation deps.espresso, {
+            exclude group: 'com.android.support', module: 'support-annotations'
+          }
+          implementation('a:b:1', {
+            exclude group: 'c'
+          })
+          implementation(libs.bar) {
+            exclude group: 'd'
+          }
+        }
+      `);
+
+      var expected = {
+        dependencies: [
+          {
+            group: '', name: 'deps.espresso', version: '', type: 'androidTestImplementation',
+            excludes: [{group: 'com.android.support', module: 'support-annotations'}]
+          },
+          {group: 'a', name: 'b', version: '1', type: 'implementation', excludes: [{group: 'c'}]},
+          {group: '', name: 'libs.bar', version: '', type: 'implementation', excludes: [{group: 'd'}]}
+        ]
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
     it('can parse project dependencies with a deep path', function() {
       var dsl = stripIndent(`
         dependencies {
@@ -1423,7 +1510,6 @@ describe('Gradle build file parser', function() {
 
     // Output snapshots, not a statement of correctness: some of these values are plainly wrong, but consumers see them.
     // The Expo files come from expo/expo@dfb069d9cc5b, the React Native one from react-native-community/template@4f3db581f9ba.
-    // The test.compile file uses dependency calls spread over several lines, which the parser doesn't handle yet (#17).
     ['expo.app', 'expo.root', 'react-native.app', 'special.dependencies', 'test.compile'].forEach(function(name) {
       it('should keep its output for the ' + name + ' gradle file', function() {
         var sampleFilePath = 'test/sample-data/' + name + '.build.gradle';
