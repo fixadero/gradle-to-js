@@ -1078,6 +1078,53 @@ describe('Gradle build file parser', function() {
       });
     });
 
+    it('can parse calls that carry on over several lines', function() {
+      // The tasks come from #13
+      var dsl = stripIndent(`
+        def coverageTaskAndroidJob = task("coverageTaskAndroidJob",
+                dependsOn: ':android-job:createCovAndroidTestCoverageReport') {
+            group = "Coverage"
+            description 'Runs coverage for android-job'
+        }
+        def coverageTaskVolley = task("coverageTaskVolley",
+                dependsOn: ':volley:createCovCoverageReport') {
+            group = "Coverage"
+            description 'Runs coverage for volley'
+        }
+        android {
+          namespace computeNamespace("com.example", // the base
+              flavor)
+          versionCode = (major * 100 +
+              minor)
+        }
+        def match = text =~ /v\\(\\d+/
+        name "a(b"
+        broken {
+          value foo(
+          key "1"
+        }
+        after "value"
+      `);
+
+      var expected = {
+        coverageTaskAndroidJob: {group: 'Coverage', description: 'Runs coverage for android-job'},
+        coverageTaskVolley: {group: 'Coverage', description: 'Runs coverage for volley'},
+        android: {
+          namespace: 'computeNamespace("com.example",\n      flavor)',
+          versionCode: '(major * 100 +\n      minor)'
+        },
+        // A parenthesis in a /slashy/ regex or a string doesn't carry the value on to the next line
+        match: 'text =~ /v\\(\\d+/',
+        name: 'a(b',
+        // One that's never closed stops at the end of its block
+        broken: {value: 'foo(\n  key "1"'},
+        after: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
     it('can parse project dependencies with a deep path', function() {
       var dsl = stripIndent(`
         dependencies {
