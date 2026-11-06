@@ -11,6 +11,7 @@
 - A tab between a key and its value counts like a space. `minSdk\t21` used to give the key `'minSdk\t21'`, and a tab-aligned `VERSION_FILE \t= 'a'` the value `"\t= 'a'"`
 - Spaces or tabs at the end of a line are no longer part of the value: `versionName "1.0" ` used to give `'"1.0" '`, quotes and all
 - A semicolon ends a statement, like a line break does. `versionName "1.0";` used to give `'"1.0";'`, quotes and all, and `minSdk 21; targetSdk 34` one value for `minSdk`. In `dependencies` and `plugins`, `implementation 'a:b:1'; implementation 'c:d:2'` used to give only the first one, and `id 'a'; id 'b'` only the last. Semicolons inside strings or parentheses stay part of the value
+- Each `exclude` in a dependency's block ends where its statement does. `{ exclude group: 'a' }` on one line used to give `group: "a }"`, and `exclude group: 'a'; exclude module: 'b'` one exclude with everything after the first `group:` in it. `exclude(group: 'a')` is read too, instead of left out, and so is a `module:` on the line after `exclude group: 'a',`. The word exclude inside a string, like in `because "we exclude what we don't need"`, no longer gives an empty exclude
 
 ## 3.0.1
 

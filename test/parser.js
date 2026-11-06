@@ -1380,6 +1380,37 @@ describe('Gradle build file parser', function() {
       });
     });
 
+    it('will read each exclude up to the end of its statement', function() {
+      var dsl = stripIndent(`
+        dependencies {
+          implementation('a:b:1') { exclude group: 'c' }
+          implementation('d:e:2') { exclude group: 'f'; exclude module: 'g'; transitive = false }
+          implementation('h:i:3', { exclude group: 'j', module: 'k' })
+          implementation('l:m:4') {
+            exclude(group: 'n')
+            exclude group: 'o',
+                    module: 'p'
+            because "we exclude what we don't need"
+          }
+        }
+      `);
+
+      var expected = {
+        dependencies: [
+          {group: 'a', name: 'b', version: '1', type: 'implementation', excludes: [{group: 'c'}]},
+          {group: 'd', name: 'e', version: '2', type: 'implementation', excludes: [{group: 'f'}, {module: 'g'}]},
+          {group: 'h', name: 'i', version: '3', type: 'implementation', excludes: [{group: 'j', module: 'k'}]},
+          {
+            group: 'l', name: 'm', version: '4', type: 'implementation',
+            excludes: [{group: 'n'}, {group: 'o', module: 'p'}]
+          }
+        ]
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
     it('can parse project dependencies with a deep path', function() {
       var dsl = stripIndent(`
         dependencies {
