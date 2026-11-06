@@ -8,6 +8,8 @@
 - Declarations with a type or modifier instead of `def`, like `final a = '1'`, `String b = '2'` or `final String c = '3'`, come back under the variable's name. They used to come back under `final` or `String`, with the rest of the line as the value. Methods like `private void d() { … }` are skipped, like `def d() { … }` already was (thanks @lingfennan, whose fork handled `final` and `String` in 2017)
 - A declaration without a value, like `def x`, no longer runs into the next line: `def x` followed by `y = 1` used to give the key `'x\ny'`
 - Variables declared inside a `dependencies` or `plugins` block, like `def isGifEnabled = …` in Expo's app build file, are no longer returned as dependencies with the type `def`, `final` or `String`
+- A tab between a key and its value counts like a space. `minSdk\t21` used to give the key `'minSdk\t21'`, and a tab-aligned `VERSION_FILE \t= 'a'` the value `"\t= 'a'"`
+- Spaces or tabs at the end of a line are no longer part of the value: `versionName "1.0" ` used to give `'"1.0" '`, quotes and all
 
 ## 3.0.1
 

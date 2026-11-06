@@ -720,6 +720,38 @@ describe('Gradle build file parser', function() {
         });
     });
 
+    it('can parse keys and values separated by tabs, and values followed by spaces or tabs', function() {
+      // Written with escapes, so that an editor can't strip the whitespace at the ends of the lines
+      var dsl = [
+        'ext {',
+        '  VERSION_FILE \t\t= \'src/main/resources/version.properties\'',
+        '  jdkVersion\t= \'1.8\'',
+        '  minSdk\t21',
+        '  String\tflavor = "free"',
+        '}',
+        'versionName "1.0"  ',
+        'versionCode 12\t',
+        'name " spaced  " \t',
+        'last "value" '
+      ].join('\n');
+
+      var expected = {
+        ext: {
+          VERSION_FILE: 'src/main/resources/version.properties',
+          jdkVersion: '1.8',
+          minSdk: '21',
+          flavor: 'free'
+        },
+        versionName: '1.0',
+        versionCode: '12',
+        name: ' spaced  ',
+        last: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
     it('will keep non-ASCII characters intact', function() {
       var dsl = stripIndent(`
         name "Mållgan åäö 日本語 🫡"
