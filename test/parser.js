@@ -859,6 +859,50 @@ describe('Gradle build file parser', function() {
       });
     });
 
+    it('can parse blocks without a space before their brace', function() {
+      var dsl = stripIndent(`
+        android{
+          defaultConfig{
+            minSdk 21
+          }
+          compileSdk 34
+        }
+        repositories{
+          maven{ url 'https://www.jitpack.io' }
+          google()
+        }
+        dependencies{
+          implementation 'a:b:1'
+        }
+        plugins{ id 'java' }
+        if (flag) {
+          skipped "value"
+        }else{
+          kept "value"
+        }
+        after "value"
+      `);
+
+      var expected = {
+        android: {
+          defaultConfig: {minSdk: '21'},
+          compileSdk: '34'
+        },
+        repositories: [
+          {type: 'maven', data: {url: 'https://www.jitpack.io'}},
+          {type: 'unknown', data: {name: 'google()'}}
+        ],
+        dependencies: [{group: 'a', name: 'b', version: '1', type: 'implementation', excludes: []}],
+        plugins: [{id: 'java'}],
+        // The same as for `} else {`
+        '': {kept: 'value'},
+        after: 'value'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
     it('will keep nested blocks inside a dependency together', function() {
       var dsl = stripIndent(`
         dependencies {

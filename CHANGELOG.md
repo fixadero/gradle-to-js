@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixes
+
+- A block without a space before its brace, like `android{` or `dependencies{`, keeps its name. It used to come back under the key `''`, with every key after it moved one block down, so `android` could end up with the contents of the next block or vanish (thanks @lingfennan, whose fork fixed this in 2017)
+
 ## 3.0.1
 
 ### Fixes
