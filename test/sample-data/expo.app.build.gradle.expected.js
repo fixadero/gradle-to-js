@@ -78,27 +78,6 @@ exports.expected = {
       "excludes": []
     },
     {
-      "group": "",
-      "name": "isGifEnabled = (findProperty('expo.gif.enabled') ?: \"\") == \"true\";",
-      "version": "",
-      "type": "def",
-      "excludes": []
-    },
-    {
-      "group": "",
-      "name": "isWebpEnabled = (findProperty('expo.webp.enabled') ?: \"\") == \"true\";",
-      "version": "",
-      "type": "def",
-      "excludes": []
-    },
-    {
-      "group": "",
-      "name": "isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: \"\") == \"true\";",
-      "version": "",
-      "type": "def",
-      "excludes": []
-    },
-    {
       "group": "com.facebook.fresco",
       "name": "animated-gif",
       "version": "${expoLibs.versions.fresco.get()}",
