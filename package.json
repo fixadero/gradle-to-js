@@ -1,6 +1,6 @@
 {
   "name": "gradle-to-js",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "A quick & dirty Gradle build file to JavaScript object parser",
   "main": "lib/parser.js",
   "bin": {
