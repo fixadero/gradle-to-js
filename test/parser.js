@@ -374,6 +374,62 @@ describe('Gradle build file parser', function() {
       });
     });
 
+    it('should collect declarations with a type or modifier instead of def as regular variables', function() {
+      var dsl = stripIndent(`
+             final a = "1"
+             String b = "2"
+             final String c = "3"
+             int d = 4
+             java.io.File e = file("e")
+             List<String> f = ["f"]
+             static final int[] g = [7]
+             def h
+             final String i // set later
+             private void addAuthority(String path) {
+               println path
+             }
+             minSdk = 21
+             versionName "1.0"
+             flag x == y
+             `);
+
+      var expected = {
+        a: '1',
+        b: '2',
+        c: '3',
+        d: '4',
+        e: 'file("e")',
+        f: ['f'],
+        g: ['7'],
+        minSdk: '21',
+        versionName: '1.0',
+        flag: 'x == y'
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
+    it('will leave variables declared among dependencies out of them', function() {
+      var dsl = stripIndent(`
+             dependencies {
+               def okHttpVersion = '3.4.1'
+               String retrofitVersion = '2.1.0'
+               final String mockito = 'org.mockito:mockito-core:1.9.5'
+               implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
+             }
+             `);
+
+      var expected = {
+        dependencies: [
+          {group: 'com.squareup.okhttp3', name: 'okhttp', version: '$okHttpVersion', type: 'implementation', excludes: []}
+        ]
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
     it('should group repositories into an array', function() {
       var dsl = stripIndent(`
              repositories {

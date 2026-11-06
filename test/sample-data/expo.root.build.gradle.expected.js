@@ -30,13 +30,6 @@ exports.expected = {
         "excludes": []
       },
       {
-        "group": "",
-        "name": "kotlinVersion = findProperty('android.kotlinVersion')",
-        "version": "",
-        "type": "def",
-        "excludes": []
-      },
-      {
         "group": "org.jetbrains.kotlin",
         "name": "kotlin-gradle-plugin",
         "version": "$kotlinVersion",

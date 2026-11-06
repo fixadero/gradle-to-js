@@ -5,6 +5,9 @@
 ### Fixes
 
 - A block without a space before its brace, like `android{` or `dependencies{`, keeps its name. It used to come back under the key `''`, with every key after it moved one block down, so `android` could end up with the contents of the next block or vanish (thanks @lingfennan, whose fork fixed this in 2017)
+- Declarations with a type or modifier instead of `def`, like `final a = '1'`, `String b = '2'` or `final String c = '3'`, come back under the variable's name. They used to come back under `final` or `String`, with the rest of the line as the value. Methods like `private void d() { … }` are skipped, like `def d() { … }` already was (thanks @lingfennan, whose fork handled `final` and `String` in 2017)
+- A declaration without a value, like `def x`, no longer runs into the next line: `def x` followed by `y = 1` used to give the key `'x\ny'`
+- Variables declared inside a `dependencies` or `plugins` block, like `def isGifEnabled = …` in Expo's app build file, are no longer returned as dependencies with the type `def`, `final` or `String`
 
 ## 3.0.1
 
