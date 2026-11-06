@@ -752,6 +752,42 @@ describe('Gradle build file parser', function() {
       });
     });
 
+    it('will end a statement at a semicolon', function() {
+      var dsl = stripIndent(`
+        android {
+          versionName "1.0";
+          minSdk 21; targetSdk 34
+          namespace = "a;b";
+        }
+        def x = foo(a; b);
+        repositories {
+          mavenCentral();
+        }
+        dependencies {
+          implementation 'a:b:1'; implementation 'c:d:2'
+          implementation 'e:f:3' ;
+        }
+        plugins {
+          id 'java'; id 'kotlin' version '2.0.0'
+        }
+      `);
+
+      var expected = {
+        android: {versionName: '1.0', minSdk: '21', targetSdk: '34', namespace: 'a;b'},
+        x: 'foo(a; b)',
+        repositories: [{type: 'unknown', data: {name: 'mavenCentral()'}}],
+        dependencies: [
+          {group: 'a', name: 'b', version: '1', type: 'implementation', excludes: []},
+          {group: 'c', name: 'd', version: '2', type: 'implementation', excludes: []},
+          {group: 'e', name: 'f', version: '3', type: 'implementation', excludes: []}
+        ],
+        plugins: [{id: 'java'}, {id: 'kotlin', version: '2.0.0'}]
+      };
+      return parser.parseText(dsl).then(function(parsedValue) {
+        assert.deepStrictEqual(parsedValue, expected);
+      });
+    });
+
     it('will keep non-ASCII characters intact', function() {
       var dsl = stripIndent(`
         name "Mållgan åäö 日本語 🫡"

@@ -10,6 +10,7 @@
 - Variables declared inside a `dependencies` or `plugins` block, like `def isGifEnabled = …` in Expo's app build file, are no longer returned as dependencies with the type `def`, `final` or `String`
 - A tab between a key and its value counts like a space. `minSdk\t21` used to give the key `'minSdk\t21'`, and a tab-aligned `VERSION_FILE \t= 'a'` the value `"\t= 'a'"`
 - Spaces or tabs at the end of a line are no longer part of the value: `versionName "1.0" ` used to give `'"1.0" '`, quotes and all
+- A semicolon ends a statement, like a line break does. `versionName "1.0";` used to give `'"1.0";'`, quotes and all, and `minSdk 21; targetSdk 34` one value for `minSdk`. In `dependencies` and `plugins`, `implementation 'a:b:1'; implementation 'c:d:2'` used to give only the first one, and `id 'a'; id 'b'` only the last. Semicolons inside strings or parentheses stay part of the value
 
 ## 3.0.1
 

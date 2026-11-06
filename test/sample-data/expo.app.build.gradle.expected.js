@@ -64,10 +64,10 @@ exports.expected = {
   "[\"pickFirsts\",": {
     "prop": "->",
     "options": [
-      "(findProperty(\"android.packagingOptions.$prop\") ?: \"\").split(\",\");",
+      "(findProperty(\"android.packagingOptions.$prop\") ?: \"\").split(\",\")",
       "-= \"\""
     ],
-    "for": "(i in 0..<options.size()) options[i] = options[i].trim();"
+    "for": "(i in 0..<options.size()) options[i] = options[i].trim()"
   },
   "dependencies": [
     {
